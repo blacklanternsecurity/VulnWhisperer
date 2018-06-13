@@ -130,11 +130,6 @@ class vulnWhispererBase(object):
             self.delete_table()
         self.create_table()
 
-    def cleanser(self, _data):
-        repls = (('\n', r'\n'), ('\r', r'\r'))
-        data = reduce(lambda a, kv: a.replace(*kv), repls, _data)
-        return data
-
     def path_check(self, _data):
         if self.write_path:
             if '/' or '\\' in _data[-1]:
@@ -384,10 +379,6 @@ class vulnWhispererNessus(vulnWhispererBase):
                             self.vprint('Processing %s/%s for scan: %s'
                                         % (scan_count, len(scan_list),
                                            scan_name))
-                            columns_to_cleanse = ['CVSS','CVE','Description','Synopsis','Solution','See Also','Plugin Output']
-
-                            for col in columns_to_cleanse:
-                                clean_csv[col] = clean_csv[col].astype(str).apply(self.cleanser)
 
                             clean_csv.rename(columns=self.COLUMN_MAPPING, inplace=True)
 
