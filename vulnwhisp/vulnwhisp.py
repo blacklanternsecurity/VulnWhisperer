@@ -177,6 +177,20 @@ class vulnWhispererBase(object):
 class vulnWhispererNessus(vulnWhispererBase):
 
     CONFIG_SECTION = 'nessus'
+    COLUMN_MAPPING = {'Plugin ID': 'plugin_id',
+                      'CVE': 'cve',
+                      'CVSS': 'cvss',
+                      'Risk': 'risk',
+                      'Host': 'asset',
+                      'Protocol': 'protocol',
+                      'Port': 'port',
+                      'Name': 'plugin_name',
+                      'Synopsis': 'synopsis',
+                      'Description': 'description',
+                      'Solution': 'solution',
+                      'See Also': 'see_also',
+                      'Plugin Output': 'plugin_output'
+                     }
 
     def __init__(
             self,
@@ -375,7 +389,12 @@ class vulnWhispererNessus(vulnWhispererBase):
                             for col in columns_to_cleanse:
                                 clean_csv[col] = clean_csv[col].astype(str).apply(self.cleanser)
 
-                            clean_csv.to_csv(relative_path_name, index=False)
+                            clean_csv.rename(columns=self.COLUMN_MAPPING, inplace=True)
+
+                            with open(relative_path_name, 'w') as f:
+                                f.write(clean_csv.to_json(orient='records', lines=True))
+                                f.write('\n')
+
                             record_meta = (
                                 scan_name,
                                 scan_id,
